@@ -1,111 +1,961 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
   <title>My New Life</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
   <style>
+    :root {
+      --bg: #0d1017;
+      --bg-soft: #131824;
+      --card: #1a2030;
+      --card-2: #20283a;
+      --text: #f6f7fb;
+      --muted: #9ba3b5;
+      --muted-2: #6f7788;
+      --accent: #88c7ff;
+      --accent-2: #b99cff;
+      --green: #9ff0c8;
+      --yellow: #ffe08a;
+      --red: #ffb4b4;
+      --border: rgba(255, 255, 255, 0.08);
+      --shadow: 0 16px 40px rgba(0,0,0,.24);
+      --radius-xl: 26px;
+      --radius: 18px;
+      --radius-sm: 13px;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
     body {
-      font-family: Arial, sans-serif;
-      margin: 16px;
-      background: #f5f5f5;
+      margin: 0;
+      background:
+        radial-gradient(circle at top left, rgba(136,199,255,.18), transparent 34%),
+        radial-gradient(circle at top right, rgba(185,156,255,.16), transparent 28%),
+        var(--bg);
+      color: var(--text);
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 16px;
+      padding-bottom: 42px;
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: 22px;
+      margin-bottom: 14px;
+      background:
+        linear-gradient(135deg, rgba(136,199,255,.18), rgba(185,156,255,.12)),
+        rgba(26,32,48,.88);
+      box-shadow: var(--shadow);
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      right: -60px;
+      top: -60px;
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.08);
+    }
+
+    .hero-top {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .title {
+      margin: 0;
+      font-size: 28px;
+      line-height: 1.05;
+      letter-spacing: -.04em;
+    }
+
+    .subtitle {
+      margin: 8px 0 0;
+      color: var(--muted);
+      line-height: 1.45;
+      font-size: 14px;
+    }
+
+    .badge {
+      flex: 0 0 auto;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.07);
+      color: var(--text);
+      padding: 8px 11px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .tabs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin: 14px 0;
+      padding: 5px;
+      border-radius: 18px;
+      background: rgba(255,255,255,.05);
+      border: 1px solid var(--border);
+    }
+
+    .tab {
+      border: 0;
+      border-radius: 14px;
+      padding: 11px 8px;
+      color: var(--muted);
+      background: transparent;
+      font-weight: 850;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .tab.active {
+      color: var(--text);
+      background: linear-gradient(135deg, rgba(136,199,255,.22), rgba(185,156,255,.18));
+    }
+
+    .section {
+      display: none;
+    }
+
+    .section.active {
+      display: block;
     }
 
     .card {
-      background: white;
-      border-radius: 16px;
-      padding: 16px;
+      background: rgba(26,32,48,.92);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 15px;
+      margin-bottom: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.12);
+    }
+
+    .card-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
       margin-bottom: 12px;
     }
 
-    button {
-      width: 100%;
+    h2 {
+      margin: 0;
+      font-size: 18px;
+      letter-spacing: -.02em;
+    }
+
+    h3 {
+      margin: 0 0 7px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    @media (max-width: 760px) {
+      .grid-4 {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .stat {
+      min-height: 104px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: linear-gradient(180deg, rgba(255,255,255,.055), rgba(255,255,255,.025));
       padding: 14px;
-      margin-top: 8px;
-      border: none;
-      border-radius: 12px;
-      font-size: 16px;
-      cursor: pointer;
+    }
+
+    .stat-label {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+
+    .stat-value {
+      margin-top: 7px;
+      font-size: 25px;
+      line-height: 1.1;
+      font-weight: 950;
+      letter-spacing: -.04em;
+    }
+
+    .stat-note {
+      margin-top: 5px;
+      color: var(--muted-2);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .controls > * {
+      flex: 1 1 auto;
     }
 
     input, textarea {
       width: 100%;
+      border: 1px solid rgba(255,255,255,.11);
+      border-radius: 15px;
       padding: 12px;
+      background: #101520;
+      color: var(--text);
+      font-size: 15px;
+      outline: none;
+      font-family: inherit;
+    }
+
+    input[type="date"] {
+      color-scheme: dark;
+    }
+
+    textarea {
+      min-height: 96px;
+      resize: vertical;
+    }
+
+    button {
+      border: 0;
+      border-radius: 15px;
+      padding: 12px 14px;
+      background: #2a3449;
+      color: var(--text);
+      font-weight: 850;
+      cursor: pointer;
+      font-size: 14px;
+      font-family: inherit;
+    }
+
+    button:active {
+      transform: scale(.99);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #3d6d9f, #6956a8);
+    }
+
+    .btn-soft {
+      background: rgba(255,255,255,.065);
+      border: 1px solid var(--border);
+    }
+
+    .btn-small {
+      padding: 10px 11px;
+      font-size: 13px;
+    }
+
+    .quick-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 9px;
+      margin-top: 10px;
+    }
+
+    .message {
+      display: none;
+      border-radius: 15px;
+      padding: 12px;
+      margin-bottom: 12px;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    .message.show {
+      display: block;
+    }
+
+    .message.ok {
+      color: var(--green);
+      background: rgba(159,240,200,.08);
+      border: 1px solid rgba(159,240,200,.18);
+    }
+
+    .message.err {
+      color: var(--red);
+      background: rgba(255,180,180,.08);
+      border: 1px solid rgba(255,180,180,.18);
+    }
+
+    .progress {
+      height: 9px;
+      margin-top: 10px;
+      border-radius: 999px;
+      background: rgba(0,0,0,.26);
+      overflow: hidden;
+    }
+
+    .progress > div {
+      height: 100%;
+      width: 0%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      transition: width .25s ease;
+    }
+
+    .entry-list {
+      display: grid;
+      gap: 9px;
+    }
+
+    .entry {
+      padding: 12px;
+      border-radius: 16px;
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.065);
+    }
+
+    .entry-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: flex-start;
+      margin-bottom: 7px;
+    }
+
+    .entry-name {
+      font-weight: 850;
+      line-height: 1.28;
+    }
+
+    .entry-time {
+      flex: 0 0 auto;
+      color: var(--muted-2);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .entry-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 5px 8px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.065);
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .empty {
+      color: var(--muted);
+      text-align: center;
+      padding: 24px 10px;
+      border: 1px dashed rgba(255,255,255,.12);
+      border-radius: 16px;
+    }
+
+    .day-chart {
+      display: grid;
+      gap: 9px;
+    }
+
+    .day-row {
+      display: grid;
+      grid-template-columns: 86px 1fr 80px;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .day-row strong {
+      color: var(--text);
+    }
+
+    .day-bar {
+      height: 11px;
+      border-radius: 999px;
+      background: rgba(0,0,0,.27);
+      overflow: hidden;
+    }
+
+    .day-bar > div {
+      height: 100%;
+      width: 0%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    }
+
+    .mini-note {
+      color: var(--muted-2);
+      font-size: 12px;
       margin-top: 8px;
-      border-radius: 10px;
-      border: 1px solid #ddd;
-      box-sizing: border-box;
+      line-height: 1.4;
+    }
+
+    .divider {
+      height: 1px;
+      background: rgba(255,255,255,.08);
+      margin: 12px 0;
     }
   </style>
 </head>
 
 <body>
-  <div class="card">
-    <h2>My New Life</h2>
-    <p id="hello">Дневник еды, воды и тренировок</p>
-  </div>
+  <main class="app">
+    <header class="hero">
+      <div class="hero-top">
+        <div>
+          <h1 class="title">My New Life</h1>
+          <p class="subtitle" id="hello">Дневник питания, воды и тренировок</p>
+        </div>
+        <div class="badge" id="statusBadge">Mini App</div>
+      </div>
+    </header>
 
-  <div class="card">
-    <h3>🍽 Добавить еду</h3>
-    <textarea id="foodText" placeholder="Например: бутер с сыром и 2 конфеты"></textarea>
-    <button onclick="sendFood()">Записать еду</button>
-  </div>
+    <div id="message" class="message"></div>
 
-  <div class="card">
-    <h3>💧 Вода</h3>
-    <button onclick="sendWater(250)">+250 мл</button>
-    <button onclick="sendWater(500)">+500 мл</button>
-  </div>
+    <nav class="tabs">
+      <button class="tab active" id="tab-day" onclick="switchTab('day')">День</button>
+      <button class="tab" id="tab-range" onclick="switchTab('range')">Период</button>
+      <button class="tab" id="tab-add" onclick="switchTab('add')">Добавить</button>
+    </nav>
 
-  <div class="card">
-    <h3>🏋️ Тренировка</h3>
-    <textarea id="workoutText" placeholder="Например: присед 3х12, планка 1 мин"></textarea>
-    <button onclick="sendWorkout()">Записать тренировку</button>
-  </div>
+    <section id="section-day" class="section active">
+      <div class="card">
+        <div class="card-title">
+          <h2>Выбранный день</h2>
+        </div>
+
+        <div class="controls">
+          <input id="dateInput" type="date" />
+          <button class="btn-small btn-soft" onclick="shiftDate(-1)">←</button>
+          <button class="btn-small btn-soft" onclick="setToday()">Сегодня</button>
+          <button class="btn-small btn-soft" onclick="shiftDate(1)">→</button>
+          <button class="btn-small btn-primary" onclick="loadDay()">Обновить</button>
+        </div>
+      </div>
+
+      <div class="grid-4">
+        <div class="stat">
+          <div class="stat-label">Калории</div>
+          <div class="stat-value" id="dayCalories">—</div>
+          <div class="stat-note" id="dayEntriesNote">—</div>
+        </div>
+
+        <div class="stat">
+          <div class="stat-label">Белки</div>
+          <div class="stat-value" id="dayProtein">—</div>
+          <div class="stat-note">граммы за день</div>
+        </div>
+
+        <div class="stat">
+          <div class="stat-label">Жиры / углеводы</div>
+          <div class="stat-value" id="dayFatCarbs">—</div>
+          <div class="stat-note">Ж / У, граммы</div>
+        </div>
+
+        <div class="stat">
+          <div class="stat-label">Вода</div>
+          <div class="stat-value" id="dayWater">—</div>
+          <div class="progress"><div id="waterProgress"></div></div>
+          <div class="stat-note">цель условно 2000 мл</div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="stat">
+          <div class="stat-label">Тренировки</div>
+          <div class="stat-value" id="dayWorkout">—</div>
+          <div class="stat-note">минут за день</div>
+        </div>
+
+        <div class="stat">
+          <div class="stat-label">Среднее</div>
+          <div class="stat-value" id="dayAverage">—</div>
+          <div class="stat-note">ккал на запись с калориями</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <h2>Записи</h2>
+        </div>
+        <div id="entriesList" class="entry-list">
+          <div class="empty">Загружаю записи…</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="section-range" class="section">
+      <div class="card">
+        <div class="card-title">
+          <h2>Период</h2>
+        </div>
+
+        <div class="grid-2">
+          <div>
+            <h3>С даты</h3>
+            <input id="startDateInput" type="date" />
+          </div>
+
+          <div>
+            <h3>По дату</h3>
+            <input id="endDateInput" type="date" />
+          </div>
+        </div>
+
+        <div class="controls" style="margin-top: 10px;">
+          <button class="btn-small btn-soft" onclick="setLastDays(7)">7 дней</button>
+          <button class="btn-small btn-soft" onclick="setLastDays(14)">14 дней</button>
+          <button class="btn-small btn-soft" onclick="setLastDays(30)">30 дней</button>
+          <button class="btn-small btn-primary" onclick="loadRange()">Показать</button>
+        </div>
+      </div>
+
+      <div class="grid-4">
+        <div class="stat">
+          <div class="stat-label">Калории всего</div>
+          <div class="stat-value" id="rangeCalories">—</div>
+          <div class="stat-note" id="rangeDaysNote">—</div>
+        </div>
+
+        <div class="stat">
+          <div class="stat-label">Среднее</div>
+          <div class="stat-value" id="rangeAverage">—</div>
+          <div class="stat-note">ккал в день</div>
+        </div>
+
+        <div class="stat">
+          <div class="stat-label">Вода</div>
+          <div class="stat-value" id="rangeWater">—</div>
+          <div class="stat-note">мл за период</div>
+        </div>
+
+        <div class="stat">
+          <div class="stat-label">Тренировки</div>
+          <div class="stat-value" id="rangeWorkout">—</div>
+          <div class="stat-note">минут за период</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <h2>Калории по дням</h2>
+        </div>
+        <div id="daysChart" class="day-chart">
+          <div class="empty">Загружаю период…</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="section-add" class="section">
+      <div class="card">
+        <div class="card-title">
+          <h2>Быстрая запись</h2>
+        </div>
+
+        <textarea id="quickText" placeholder="Например: съела вафельную трубочку Яшкино 5 штук 100 г"></textarea>
+
+        <div class="quick-actions">
+          <button class="btn-primary" onclick="sendQuick('food')">🍽 Еда</button>
+          <button onclick="sendQuick('workout')">🏋️ Тренировка</button>
+          <button onclick="sendWater(250)">💧 +250 мл</button>
+          <button onclick="sendWater(500)">💧 +500 мл</button>
+        </div>
+
+        <div class="divider"></div>
+
+        <p class="mini-note">
+          Фото еды, фото этикетки и голосовые лучше отправлять прямо в чат с ботом.
+          После обработки обнови статистику за день.
+        </p>
+      </div>
+
+      <div class="card">
+        <h2>Подсказки</h2>
+        <p class="mini-note">
+          Для точного расчёта пиши вес: «5 штук 100 г».  
+          Если бот не нашёл продукт, отправь данные с упаковки:  
+          «на 100 г 480 ккал, белки 6, жиры 22, углеводы 65».
+        </p>
+      </div>
+    </section>
+  </main>
 
   <script>
-    const tg = window.Telegram.WebApp;
-    tg.ready();
-    tg.expand();
+    const tg = window.Telegram?.WebApp || null;
 
-    const user = tg.initDataUnsafe?.user;
-
-    if (user) {
-      document.getElementById("hello").innerText =
-        `Привет, ${user.first_name}!`;
+    if (tg) {
+      tg.ready();
+      tg.expand();
     }
 
-    function sendToBot(payload) {
+    const tgUser = tg?.initDataUnsafe?.user || null;
+    const query = new URLSearchParams(window.location.search);
+
+    function getUserId() {
+      return tgUser?.id || query.get("user_id") || "";
+    }
+
+    function getInitData() {
+      return encodeURIComponent(tg?.initData || "");
+    }
+
+    function showMessage(text, type = "ok") {
+      const box = document.getElementById("message");
+
+      if (!text) {
+        box.className = "message";
+        box.textContent = "";
+        return;
+      }
+
+      box.className = `message show ${type}`;
+      box.textContent = text;
+    }
+
+    function pad(value) {
+      return String(value).padStart(2, "0");
+    }
+
+    function toISODate(date) {
+      return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+    }
+
+    function parseISODate(value) {
+      if (!value) return new Date();
+
+      const parts = value.split("-").map(Number);
+
+      if (parts.length !== 3) return new Date();
+
+      return new Date(parts[0], parts[1] - 1, parts[2]);
+    }
+
+    function addDays(date, days) {
+      const copy = new Date(date);
+      copy.setDate(copy.getDate() + days);
+      return copy;
+    }
+
+    function setToday() {
+      document.getElementById("dateInput").value = toISODate(new Date());
+      loadDay();
+    }
+
+    function shiftDate(days) {
+      const input = document.getElementById("dateInput");
+      const current = parseISODate(input.value);
+      input.value = toISODate(addDays(current, days));
+      loadDay();
+    }
+
+    function setLastDays(days) {
+      const end = new Date();
+      const start = addDays(end, -(days - 1));
+
+      document.getElementById("startDateInput").value = toISODate(start);
+      document.getElementById("endDateInput").value = toISODate(end);
+
+      loadRange();
+    }
+
+    function switchTab(tab) {
+      for (const name of ["day", "range", "add"]) {
+        document.getElementById(`section-${name}`).classList.toggle("active", name === tab);
+        document.getElementById(`tab-${name}`).classList.toggle("active", name === tab);
+      }
+
+      showMessage("");
+
+      if (tab === "day") loadDay();
+      if (tab === "range") loadRange();
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "").replace(/[&<>'"]/g, char => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        "'": "&#39;",
+        '"': "&quot;",
+      }[char]));
+    }
+
+    function fmtNum(value, digits = 0) {
+      const num = Number(value || 0);
+      return num.toFixed(digits).replace(".0", "");
+    }
+
+    function fmtDateShort(value) {
+      if (!value) return "—";
+
+      const parts = value.split("-");
+
+      if (parts.length !== 3) return value;
+
+      return `${parts[2]}.${parts[1]}`;
+    }
+
+    async function fetchJson(url) {
+      const response = await fetch(url);
+
+      if (!response.ok) {
+        const text = await response.text();
+        throw new Error(text || `HTTP ${response.status}`);
+      }
+
+      return response.json();
+    }
+
+    async function loadDay() {
+      const userId = getUserId();
+
+      if (!userId) {
+        showMessage("Не вижу Telegram user_id. Открой Mini App через кнопку бота.", "err");
+        return;
+      }
+
+      const selectedDate = document.getElementById("dateInput").value || toISODate(new Date());
+
+      try {
+        showMessage("");
+
+        const data = await fetchJson(
+          `/api/day?user_id=${encodeURIComponent(userId)}&date=${encodeURIComponent(selectedDate)}&init_data=${getInitData()}`
+        );
+
+        renderDay(data);
+      } catch (error) {
+        showMessage(`Не смогла загрузить день: ${error.message}`, "err");
+      }
+    }
+
+    async function loadRange() {
+      const userId = getUserId();
+
+      if (!userId) {
+        showMessage("Не вижу Telegram user_id. Открой Mini App через кнопку бота.", "err");
+        return;
+      }
+
+      const start = document.getElementById("startDateInput").value;
+      const end = document.getElementById("endDateInput").value;
+
+      if (!start || !end) return;
+
+      try {
+        showMessage("");
+
+        const data = await fetchJson(
+          `/api/range?user_id=${encodeURIComponent(userId)}&start_date=${encodeURIComponent(start)}&end_date=${encodeURIComponent(end)}&init_data=${getInitData()}`
+        );
+
+        renderRange(data);
+      } catch (error) {
+        showMessage(`Не смогла загрузить период: ${error.message}`, "err");
+      }
+    }
+
+    function renderDay(data) {
+      const totals = data.totals || {};
+      const entries = data.entries || [];
+
+      const calories = Math.round(Number(totals.calories || 0));
+      const protein = Number(totals.protein || 0);
+      const fat = Number(totals.fat || 0);
+      const carbs = Number(totals.carbs || 0);
+      const water = Number(totals.water_ml || 0);
+      const workout = Number(totals.workout_minutes || 0);
+
+      const calorieEntries = entries.filter(item => Number(item.calories || 0) > 0);
+      const avg = calorieEntries.length ? Math.round(calories / calorieEntries.length) : 0;
+
+      document.getElementById("dayCalories").textContent = `${calories}`;
+      document.getElementById("dayEntriesNote").textContent = `${entries.length} записей`;
+      document.getElementById("dayProtein").textContent = `${fmtNum(protein, 1)} г`;
+      document.getElementById("dayFatCarbs").textContent = `${fmtNum(fat, 1)} / ${fmtNum(carbs, 1)}`;
+      document.getElementById("dayWater").textContent = `${water} мл`;
+      document.getElementById("dayWorkout").textContent = `${workout}`;
+      document.getElementById("dayAverage").textContent = avg ? `${avg}` : "—";
+
+      document.getElementById("waterProgress").style.width =
+        `${Math.min(100, Math.round((water / 2000) * 100))}%`;
+
+      renderEntries(entries);
+    }
+
+    function renderEntries(entries) {
+      const root = document.getElementById("entriesList");
+
+      if (!entries.length) {
+        root.innerHTML = `<div class="empty">За этот день пока нет записей.</div>`;
+        return;
+      }
+
+      root.innerHTML = entries.slice().reverse().map(entry => {
+        const calories = Math.round(Number(entry.calories || 0));
+        const protein = Number(entry.protein || 0);
+        const fat = Number(entry.fat || 0);
+        const carbs = Number(entry.carbs || 0);
+        const water = Number(entry.water_ml || 0);
+        const workout = Number(entry.workout_minutes || 0);
+
+        const pills = [];
+
+        if (calories) pills.push(`🔥 ${calories} ккал`);
+        if (protein || fat || carbs) pills.push(`БЖУ ${fmtNum(protein,1)}/${fmtNum(fat,1)}/${fmtNum(carbs,1)} г`);
+        if (water) pills.push(`💧 ${water} мл`);
+        if (workout) pills.push(`🏋️ ${workout} мин`);
+        pills.push(`тип: ${entry.entry_type || "unknown"}`);
+
+        return `
+          <article class="entry">
+            <div class="entry-head">
+              <div class="entry-name">#${entry.id} · ${escapeHtml(entry.description || "Запись")}</div>
+              <div class="entry-time">${escapeHtml(String(entry.created_at || "").slice(11, 16))}</div>
+            </div>
+
+            <div class="entry-meta">
+              ${pills.map(pill => `<span class="pill">${escapeHtml(pill)}</span>`).join("")}
+            </div>
+          </article>
+        `;
+      }).join("");
+    }
+
+    function renderRange(data) {
+      const totals = data.totals || {};
+      const period = data.period || {};
+      const byDay = data.by_day || [];
+
+      const days = Number(period.days || 1);
+      const calories = Math.round(Number(totals.calories || 0));
+      const avg = days ? Math.round(calories / days) : 0;
+      const water = Number(totals.water_ml || 0);
+      const workout = Number(totals.workout_minutes || 0);
+
+      document.getElementById("rangeCalories").textContent = `${calories}`;
+      document.getElementById("rangeAverage").textContent = `${avg}`;
+      document.getElementById("rangeWater").textContent = `${water} мл`;
+      document.getElementById("rangeWorkout").textContent = `${workout}`;
+      document.getElementById("rangeDaysNote").textContent = `${days} дней`;
+
+      renderDayChart(byDay);
+    }
+
+    function renderDayChart(days) {
+      const root = document.getElementById("daysChart");
+
+      if (!days.length) {
+        root.innerHTML = `<div class="empty">За этот период пока нет записей.</div>`;
+        return;
+      }
+
+      const maxCalories = Math.max(...days.map(day => Number(day.calories || 0)), 1);
+
+      root.innerHTML = days.map(day => {
+        const calories = Math.round(Number(day.calories || 0));
+        const width = Math.max(3, Math.round((calories / maxCalories) * 100));
+
+        return `
+          <div class="day-row">
+            <div><strong>${fmtDateShort(day.date)}</strong></div>
+            <div class="day-bar"><div style="width:${width}%"></div></div>
+            <div style="text-align:right;">${calories} ккал</div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function sendPayload(payload) {
+      if (!tg) {
+        showMessage("Открой Mini App внутри Telegram, чтобы отправлять записи.", "err");
+        return;
+      }
+
       tg.sendData(JSON.stringify(payload));
+      showMessage("Отправила запись боту. Вернись в чат, чтобы увидеть результат.", "ok");
     }
 
-    function sendFood() {
-      const text = document.getElementById("foodText").value;
+    function sendQuick(type) {
+      const textarea = document.getElementById("quickText");
+      const text = textarea.value.trim();
 
-      sendToBot({
-        type: "food",
-        text: text
-      });
+      if (!text) {
+        showMessage("Сначала напиши запись.", "err");
+        return;
+      }
+
+      sendPayload({ type, text });
+      textarea.value = "";
     }
 
     function sendWater(amount) {
-      sendToBot({
-        type: "water",
-        water_ml: amount
-      });
+      sendPayload({ type: "water", water_ml: amount });
     }
 
-    function sendWorkout() {
-      const text = document.getElementById("workoutText").value;
+    function init() {
+      if (tgUser) {
+        document.getElementById("hello").textContent = `Привет, ${tgUser.first_name}!`;
+      } else {
+        document.getElementById("statusBadge").textContent = "Preview";
+      }
 
-      sendToBot({
-        type: "workout",
-        text: text
-      });
+      const today = new Date();
+
+      document.getElementById("dateInput").value = toISODate(today);
+      document.getElementById("startDateInput").value = toISODate(addDays(today, -6));
+      document.getElementById("endDateInput").value = toISODate(today);
+
+      loadDay();
     }
+
+    init();
   </script>
 </body>
 </html>
